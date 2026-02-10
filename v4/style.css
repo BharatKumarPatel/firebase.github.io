@@ -1,0 +1,310 @@
+/* --- 1. CORE VARIABLES (The VYUHA Theme) --- */
+:root {
+    --bg: #FFFFFF;
+    --sidebar-bg: #F8F9FA;
+    --text-main: #050505;
+    --text-light: #666;
+    --border: #E5E5E5;
+    --accent: #000000;
+    --highlight: #00CC66; /* Status Green */
+    --error: #FF3333;
+    
+    --font-main: 'Inter', sans-serif;
+    --font-code: 'JetBrains Mono', monospace;
+    
+    --sidebar-width: 260px;
+}
+
+/* --- 2. GLOBAL RESET --- */
+* {
+    box-sizing: border-box;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-main);
+    background: var(--bg);
+    color: var(--text-main);
+    height: 100vh;
+    overflow: hidden; /* Scroll sirf content area mein hoga */
+}
+
+/* UTILITY CLASSES (Phase 3 mein kaam aayengi) */
+.hidden { display: none !important; }
+.locked { background: #F5F5F5 !important; color: #999 !important; cursor: not-allowed; border-color: #EEE !important; }
+.badge-lock { background: #000; color: #fff; padding: 2px 6px; font-size: 0.6rem; border-radius: 4px; margin-left: 5px; }
+.badge-visible { background: #E0E0E0; color: #000; padding: 2px 6px; font-size: 0.6rem; border-radius: 4px; margin-left: 5px; }
+
+/* --- 3. OVERLAYS (Login & Loading) --- */
+#loadingOverlay, #loginOverlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: #FFF; z-index: 2000;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column;
+}
+
+/* Loading Animation */
+.loader-content { text-align: center; animation: pulse 2s infinite; }
+.brand-text-lg { font-size: 3rem; font-weight: 900; letter-spacing: -2px; }
+.loader-text { font-family: var(--font-code); font-size: 0.8rem; margin-top: 10px; color: var(--text-light); }
+
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+/* Login Box */
+.login-box { width: 100%; max-width: 350px; padding: 20px; text-align: center; }
+.brand-text-login { font-size: 2rem; font-weight: 900; letter-spacing: -1px; margin-bottom: 5px; }
+.login-subtitle { font-family: var(--font-code); font-size: 0.8rem; color: var(--text-light); margin-bottom: 30px; }
+
+.login-input {
+    width: 100%; padding: 15px; margin-bottom: 15px;
+    border: 1px solid var(--border);
+    font-family: var(--font-code); font-size: 0.9rem;
+    transition: 0.2s;
+}
+.login-input:focus { border-color: #000; border-left: 4px solid #000; }
+
+.login-btn {
+    width: 100%; padding: 15px;
+    background: #000; color: #FFF;
+    font-weight: 800; border: none; cursor: pointer;
+    font-family: var(--font-main); letter-spacing: 1px;
+    margin-top: 10px;
+}
+.login-btn:hover { background: #333; transform: translateY(-1px); }
+
+.error-text { color: var(--error); font-family: var(--font-code); font-size: 0.75rem; margin-top: 15px; min-height: 20px; }
+.login-footer { margin-top: 40px; font-size: 0.7rem; color: #CCC; font-family: var(--font-code); }
+
+
+/* --- 4. MAIN DASHBOARD LAYOUT --- */
+#dashboardWrapper {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+/* A. SIDEBAR (Left 20% / Fixed 260px) */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column;
+    flex-shrink: 0; /* Shrink nahi hoga */
+    z-index: 100;
+}
+
+.sidebar-header {
+    height: 70px; display: flex; align-items: center; padding: 0 25px;
+    border-bottom: 1px solid var(--border);
+}
+.sidebar-logo { height: 28px; width: auto; object-fit: contain; }
+.sidebar-brand { font-weight: 900; font-size: 1.2rem; letter-spacing: -0.5px; }
+
+/* User Mini Profile in Sidebar */
+.user-profile-summary {
+    padding: 25px;
+    display: flex; align-items: center; gap: 15px;
+    border-bottom: 1px solid var(--border);
+}
+.user-avatar-small {
+    width: 45px; height: 45px;
+    background: #EEE; border-radius: 50%;
+    border: 1px solid #CCC;
+    background-size: cover; background-position: center;
+}
+.user-info-text { display: flex; flex-direction: column; overflow: hidden; }
+#sidebarName { font-weight: 700; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.role-badge { 
+    font-family: var(--font-code); font-size: 0.65rem; 
+    background: #000; color: #FFF; 
+    padding: 2px 6px; border-radius: 4px; 
+    width: fit-content; margin-top: 4px;
+}
+
+/* Navigation Links */
+.sidebar-nav { flex: 1; padding: 20px 0; overflow-y: auto; }
+.nav-item {
+    padding: 12px 25px;
+    display: flex; align-items: center; gap: 12px;
+    color: var(--text-light); cursor: pointer;
+    font-weight: 500; font-size: 0.9rem;
+    transition: 0.2s; border-left: 3px solid transparent;
+}
+.nav-item:hover { color: #000; background: #EEE; }
+.nav-item.active { background: #FFF; color: #000; border-left-color: #000; font-weight: 800; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.nav-item i { font-size: 1.2rem; }
+
+/* Sidebar Footer (Logout) */
+.sidebar-footer { padding: 20px; border-top: 1px solid var(--border); }
+.logout-btn {
+    width: 100%; padding: 10px;
+    border: 1px solid var(--error); color: var(--error); background: transparent;
+    font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;
+    font-size: 0.8rem;
+}
+.logout-btn:hover { background: var(--error); color: #FFF; }
+
+
+/* B. CONTENT AREA (Right 80%) */
+.content-area {
+    flex: 1;
+    overflow-y: auto; /* Scroll sirf yahan hoga */
+    background: #FFF;
+    padding: 40px 60px;
+    padding-bottom: 120px; /* Action bar ke liye jagah */
+}
+
+.section-header { margin-bottom: 40px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+.section-header h1 { margin: 0; font-size: 1.8rem; font-weight: 900; letter-spacing: -1px; }
+.section-header p { margin: 5px 0 0; color: var(--text-light); font-family: var(--font-code); font-size: 0.85rem; }
+
+/* Stats Grid */
+.stats-container {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 20px; margin-bottom: 40px;
+}
+.stat-card {
+    background: #FAFAFA; border: 1px solid var(--border);
+    padding: 20px; text-align: center;
+}
+.stat-card label { display: block; font-family: var(--font-code); font-size: 0.7rem; color: #999; margin-bottom: 5px; font-weight: 700; }
+.stat-card div { font-size: 1.5rem; font-weight: 800; color: #000; }
+.status-active { color: var(--highlight) !important; }
+
+/* Forms */
+.form-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 30px; margin-bottom: 30px;
+}
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.full-width { grid-column: 1 / -1; }
+
+.form-group label {
+    font-family: var(--font-code); font-size: 0.75rem;
+    color: #888; font-weight: 700; text-transform: uppercase;
+    display: flex; align-items: center;
+}
+
+.input-field {
+    padding: 12px 15px; font-size: 1rem;
+    border: 1px solid var(--border);
+    font-family: var(--font-main); color: #000;
+    transition: 0.2s; border-radius: 0;
+}
+.input-field:focus { border-color: #000; outline: none; }
+
+.textarea { min-height: 120px; line-height: 1.6; resize: vertical; }
+.textarea.large { min-height: 200px; }
+
+/* Logo Selector */
+.logo-grid { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 10px; }
+.logo-option {
+    width: 60px; height: 60px;
+    border: 1px solid var(--border); cursor: pointer;
+    padding: 2px; border-radius: 50%; /* Circular */
+    transition: 0.2s;
+}
+.logo-option:hover { transform: scale(1.1); border-color: #999; }
+.logo-option.selected { border: 2px solid #000; transform: scale(1.1); }
+.logo-option img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+/* Password Strength */
+.info-text { font-family: var(--font-code); font-size: 0.7rem; color: #CCC; margin-top: 5px; }
+
+/* Admin Room List */
+.room-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px; border: 1px solid var(--border); margin-bottom: 15px;
+    background: #FAFAFA;
+}
+.room-meta h3 { margin: 0; font-size: 1rem; font-weight: 800; }
+.room-meta span { font-family: var(--font-code); font-size: 0.75rem; color: #666; }
+.btn-toggle { padding: 5px 10px; font-size: 0.7rem; cursor: pointer; border: 1px solid #000; background: #fff; margin-right: 5px; }
+.btn-del { padding: 5px 10px; font-size: 0.7rem; cursor: pointer; border: 1px solid var(--error); color: var(--error); background: #fff; }
+
+/* --- 5. ACTION BAR (Footer) --- */
+.action-bar {
+    position: fixed; bottom: 0; right: 0; 
+    /* Desktop Width = 100% - Sidebar Width */
+    width: calc(100% - var(--sidebar-width)); 
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid var(--border);
+    padding: 20px 60px;
+    display: flex; justify-content: space-between; align-items: center;
+    z-index: 50;
+}
+
+.help-section { font-family: var(--font-code); font-size: 0.8rem; font-weight: 600; color: #444; display: flex; align-items: center; gap: 8px; }
+.help-section a { color: #000; text-decoration: none; border-bottom: 1px solid #000; }
+
+.save-btn {
+    padding: 12px 40px;
+    background: #000; color: #FFF;
+    font-weight: 800; font-size: 0.9rem;
+    border: none; cursor: pointer; text-transform: uppercase;
+}
+.save-btn:hover { background: #333; }
+
+/* --- 6. MOBILE RESPONSIVENESS (The Critical Fix) --- */
+@media (max-width: 900px) {
+    #dashboardWrapper { flex-direction: column; }
+    
+    /* Sidebar becomes Top Header */
+    .sidebar {
+        width: 100%; height: auto;
+        border-right: none; border-bottom: 1px solid var(--border);
+        flex-direction: row; align-items: center; justify-content: space-between;
+        padding: 0;
+    }
+    .sidebar-header { border-bottom: none; height: 60px; padding: 0 15px; }
+    .user-profile-summary { display: none; /* Mobile mein space nahi hai */ }
+    
+    /* Scrollable Horizontal Nav */
+    .sidebar-nav {
+        display: flex; flex-direction: row; padding: 0; overflow-x: auto;
+        flex: 1; align-items: center;
+    }
+    .nav-item {
+        padding: 0 15px; height: 60px; white-space: nowrap;
+        border-left: none; border-bottom: 3px solid transparent;
+        font-size: 0.8rem;
+    }
+    .nav-item.active { border-left: none; border-bottom-color: #000; }
+    .nav-item span { display: none; /* Sirf Icons dikhayenge mobile par? Nahi, user ne overlap mana kiya hai. Let's keep text but small */ }
+    
+    /* Logout Button Mobile */
+    .sidebar-footer { padding: 0 15px; border-top: none; border-left: 1px solid var(--border); }
+    .logout-btn { border: none; font-size: 1.2rem; color: var(--error); padding: 0; }
+    .logout-btn span, .logout-btn i { display: block; } /* Sirf icon dikhao ya text? */
+    
+    /* Content Area Fix */
+    .content-area {
+        padding: 20px;
+        padding-bottom: 100px;
+        width: 100%; /* Full width */
+    }
+    
+    .form-grid { grid-template-columns: 1fr; gap: 15px; }
+    .stats-container { grid-template-columns: 1fr 1fr; gap: 10px; }
+    
+    /* Action Bar Fix */
+    .action-bar {
+        width: 100%; left: 0; /* Full width bottom */
+        padding: 15px 20px;
+        flex-direction: column; gap: 10px;
+    }
+    .help-section { font-size: 0.7rem; }
+    .save-btn { width: 100%; }
+    
+    /* Font Adjustments */
+    .section-header h1 { font-size: 1.4rem; }
+}
+
+@media (max-width: 480px) {
+    .nav-item span { display: none; } /* Mobile Portrait: Sirf Icons */
+    .nav-item i { font-size: 1.4rem; }
+}
