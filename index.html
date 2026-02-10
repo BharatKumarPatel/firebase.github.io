@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI_LEAGUE | MASTER_VIEW</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        :root {
+            --bg: #FFFFFF;
+            --text-main: #111;
+            --text-light: #777;
+            --border: #EAEAEA;
+            --accent: #000;
+            --highlight: #FAFAFA;
+        }
+
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            height: 100vh; /* Fixed Height for No Scroll */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; 
+        }
+
+        /* --- 1. HEADER (Fixed) --- */
+        header {
+            height: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            flex-shrink: 0;
+            border-bottom: 1px solid var(--border);
+            z-index: 50;
+            background: #fff;
+        }
+
+        .brand-box { display: flex; align-items: center; gap: 10px; }
+        .main-logo { height: 24px; width: auto; }
+        .brand-text { font-weight: 800; font-size: 0.9rem; letter-spacing: -0.5px; }
+
+        /* --- 2. MAIN AREA (Flexible) --- */
+        main {
+            flex: 1;
+            position: relative;
+            overflow: hidden; /* Hide overflow for home screen */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- 3. IDLE LIST (10 Rows, Auto Fit) --- */
+        .idle-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-evenly; /* Distribute 10 items evenly */
+            padding: 10px 0;
+            transition: opacity 0.2s;
+        }
+        .idle-container.hidden { display: none; opacity: 0; }
+
+        /* The Magic Row */
+        .hot-row {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            flex: 1; /* Take equal space */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            cursor: pointer;
+            border-bottom: 1px dashed transparent;
+            transition: background 0.2s;
+        }
+        
+        .hot-row:hover { background: var(--highlight); }
+        .hot-row:not(:last-child) { border-bottom-color: #F5F5F5; }
+
+        .row-left { display: flex; align-items: center; gap: 15px; }
+        .row-idx { 
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: 0.7rem; color: #CCC; width: 20px; 
+        }
+        .row-icon { font-size: 1.1rem; color: #444; }
+        
+        .row-text { 
+            font-size: 0.95rem; font-weight: 500; color: #222; 
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .row-tag { 
+            font-family: 'JetBrains Mono', monospace; 
+            font-size: 0.65rem; 
+            background: #F4F4F4; 
+            padding: 3px 6px; 
+            border-radius: 4px; 
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        /* --- 4. RESULTS (Scrollable Area) --- */
+        .results-wrapper {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            overflow-y: auto; /* Allow scroll ONLY for results */
+            padding: 20px;
+            padding-bottom: 100px; /* Space for dock */
+            background: #fff;
+            display: none;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .results-wrapper.visible { display: block; animation: fadeIn 0.2s ease; }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+
+        /* --- 5. DATA CARDS (Detailed) --- */
+        .profile-card {
+            border: 1px solid var(--border);
+            border-radius: 0;
+            margin-bottom: 20px;
+            background: #fff;
+        }
+        .pc-head {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 15px;
+            background: #FAFAFA;
+        }
+        .pc-img { width: 50px; height: 50px; border: 1px solid var(--border); background: #fff; object-fit: contain; }
+        .pc-title h2 { margin: 0; font-size: 1.2rem; font-weight: 800; }
+        .pc-title p { margin: 2px 0 0; font-size: 0.75rem; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .pc-body { padding: 20px; }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-item label { display: block; font-size: 0.65rem; color: #999; text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
+        .stat-item div { font-size: 0.95rem; font-weight: 600; color: #000; }
+
+        .tags-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 15px; }
+        .tag { font-size: 0.7rem; background: #EEE; padding: 4px 8px; font-weight: 600; }
+
+        .bio-box { font-size: 0.9rem; line-height: 1.5; color: #444; border-top: 1px solid var(--border); padding-top: 15px; }
+
+        /* Chat Specific */
+        .chat-row { padding: 10px 0; border-bottom: 1px solid #f5f5f5; display: flex; gap: 10px; font-size: 0.9rem; }
+        .c-user { font-weight: 700; width: 100px; color: #000; }
+        .c-msg { flex: 1; color: #333; }
+        .c-winner { background: #FFD700; color: #000; padding: 5px 10px; font-weight: 800; font-size: 0.8rem; display: inline-block; margin-top: 5px; }
+
+        /* --- 6. SEARCH DOCK (Fixed) --- */
+        .dock {
+            height: 70px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            background: rgba(255,255,255,0.95);
+            flex-shrink: 0;
+            z-index: 100;
+        }
+        .search-input { flex: 1; height: 100%; border: none; background: transparent; font-size: 1.2rem; font-weight: 500; font-family: 'Inter'; }
+        .search-input::placeholder { color: #CCC; }
+        .dock i { font-size: 1.4rem; color: #000; margin-right: 15px; }
+
+        /* --- MOBILE OPTIMIZATIONS --- */
+        @media (max-height: 700px) {
+            .hot-row { padding: 0 15px; }
+            .row-text { font-size: 0.85rem; }
+            .row-icon { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-box">
+            <img src="logo.png" alt="LOGO" class="main-logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+            <div class="brand-text" style="display:none">AI_LEAGUE</div>
+        </div>
+        <div style="font-size:0.7rem; font-weight:700; color:#00CC66;">● ONLINE</div>
+    </header>
+
+    <main>
+        
+        <div class="idle-container" id="idleState">
+            
+            <div class="hot-row" onclick="runSearch('Innovation')">
+                <div class="row-left">
+                    <span class="row-idx">01</span>
+                    <i class="ph-bold ph-trend-up row-icon"></i>
+                    <span class="row-text">Trending: Innovation Lab</span>
+                </div>
+                <span class="row-tag">LIVE</span>
+            </div>
+
+            <div class="hot-row" onclick="runSearch('Rohan')">
+                <div class="row-left">
+                    <span class="row-idx">02</span>
+                    <i class="ph-bold ph-trophy row-icon"></i>
+                    <span class="row-text">Rank #1: Rohan Kumar</span>
+                </div>
+                <span class="row-tag">STUDENT</span>
+            </div>
+
+            <div class="hot-row" onclick="runSearch('Doctors')">
+                <div class="row-left">
+                    <span class="row-idx">03</span>
+                    <i class="ph-bold ph-chats-circle row-icon"></i>
+                    <span class="row-text">Debate: AI vs Doctors</span>
+                </div>
+                <span class="row-tag">TOPIC</span>
+            </div>
+
+            <div class="hot-row" onclick="runSearch('Admin')">
+                <div class="row-left">
+                    <span class="row-idx">04</span>
+                    <i class="ph-bold ph-shield-check row-icon"></i>
+                    <span class="row-text">System Administrator</span>
+                </div>
+                <span class="row-tag">ROOT</span>
+            </div>
+
+            <div class="hot-row" onclick="runSearch('DPS')">
+                <div class="row-left">
+                    <span class="row-idx">05</span>
+                    <i class="ph-bold ph-buildings row-icon"></i>
+                    <span class="row-text">School: Shanti Niketan BLT</span>
+                </div>
+                <span class="row-tag">GOLD</span>
+            </div>
+
+            <div class="hot-row" onclick="runSearch('Mars')">
+                <div class="row-left">
+                    <span class="row-idx">06</span>
+                    <i class="ph-bold ph-planet row-icon"></i>
+                    <span class="row-text">Archive: Mars Mission</span>
+                </div>
+                <span class="row-tag">CHAT</span>
+            </div>
+
+            <div class="hot-row" onclick="runSearch('Priya')">
+                <div class="row-left">
+                    <span class="row-idx">07</span>
+                    <i class="ph-bold ph-user row-icon"></i>
+                    <span class="row-text">Student: Priya Singh</span>
+                </div>
+                <span class="row-tag">MUMBAI</span>
+            </div>
+
+            <div class="hot-row" onclick="runSearch('KVS')">
+                <div class="row-left">
+                    <span class="row-idx">08</span>
+                    <i class="ph-bold ph-buildings row-icon"></i>
+                    <span class="row-text">School: Kendriya Vidyalaya</span>
+                </div>
+                <span class="row-tag">SILVER</span>
+            </div>
+
+            <div class="hot-row" onclick="runSearch('Parliament')">
+                <div class="row-left">
+                    <span class="row-idx">09</span>
+                    <i class="ph-bold ph-users-three row-icon"></i>
+                    <span class="row-text">Room: The Parliament</span>
+                </div>
+                <span class="row-tag">ROOM</span>
+            </div>
+
+            <div class="hot-row" onclick="runSearch('Social Media')">
+                <div class="row-left">
+                    <span class="row-idx">10</span>
+                    <i class="ph-bold ph-hash row-icon"></i>
+                    <span class="row-text">Topic: Social Media Ban</span>
+                </div>
+                <span class="row-tag">NEW</span>
+            </div>
+
+        </div>
+
+        <div class="results-wrapper" id="resultsArea"></div>
+
+    </main>
+
+    <div class="dock">
+        <i class="ph-bold ph-magnifying-glass"></i>
+        <input type="text" id="searchInput" class="search-input" placeholder="Type command (min 3 chars)..." autocomplete="off">
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "PASTE_YOUR_API_KEY_HERE",
+            authDomain: "ai-quizz-97fb9.firebaseapp.com",
+            databaseURL: "https://ai-quizz-97fb9-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "ai-quizz-97fb9",
+            storageBucket: "ai-quizz-97fb9.firebasestorage.app",
+            messagingSenderId: "572423560278",
+            appId: "1:572423560278:web:c15c0e8a14b452068f2ff7"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const input = document.getElementById("searchInput");
+        const idleState = document.getElementById("idleState");
+        const resultsArea = document.getElementById("resultsArea");
+
+        // TYPEWRITER
+        const placeholders = ["Search 'Rohan Kumar'...", "Find 'Innovation Lab'...", "Topic 'AI Doctors'..."];
+        let phIndex = 0, charIndex = 0, isDeleting = false;
+        function typeWriter() {
+            if (input.value.length > 0) return;
+            const current = placeholders[phIndex];
+            if (isDeleting) { input.setAttribute("placeholder", current.substring(0, charIndex - 1)); charIndex--; } 
+            else { input.setAttribute("placeholder", current.substring(0, charIndex + 1)); charIndex++; }
+            
+            if (!isDeleting && charIndex === current.length) { isDeleting = true; setTimeout(typeWriter, 2000); return; }
+            if (isDeleting && charIndex === 0) { isDeleting = false; phIndex = (phIndex + 1) % placeholders.length; setTimeout(typeWriter, 200); return; }
+            setTimeout(typeWriter, isDeleting ? 50 : 100);
+        }
+        typeWriter();
+
+        // SEARCH
+        let debounce;
+        window.runSearch = (val) => { input.value = val; handleInput(val); };
+
+        input.addEventListener('keyup', (e) => {
+            clearTimeout(debounce);
+            debounce = setTimeout(() => handleInput(e.target.value), 300);
+        });
+
+        function handleInput(val) {
+            val = val.trim();
+            if(val.length < 3) {
+                idleState.classList.remove("hidden");
+                resultsArea.classList.remove("visible");
+                return;
+            }
+            idleState.classList.add("hidden");
+            fetchData(val.toLowerCase());
+        }
+
+        async function fetchData(query) {
+            resultsArea.classList.add("visible");
+            try {
+                const dbRef = ref(db);
+                const [schoolsSnap, studentsSnap, chatsSnap, configSnap] = await Promise.all([
+                    get(child(dbRef, "schools")), get(child(dbRef, "students")), get(child(dbRef, "room_chats")), get(child(dbRef, "system_config"))
+                ]);
+
+                let matches = [];
+
+                if (schoolsSnap.exists()) {
+                    const data = schoolsSnap.val();
+                    Object.keys(data).forEach(key => {
+                        if (key.toLowerCase().includes(query) || (data[key].public_info.botName && data[key].public_info.botName.toLowerCase().includes(query))) matches.push({ type: 'SCHOOL', id: key, data: data[key] });
+                    });
+                }
+                if (studentsSnap.exists()) {
+                    const data = studentsSnap.val();
+                    Object.keys(data).forEach(key => {
+                        if (key.toLowerCase().includes(query) || (data[key].public_info.botName && data[key].public_info.botName.toLowerCase().includes(query))) matches.push({ type: 'STUDENT', id: key, data: data[key] });
+                    });
+                }
+                if (configSnap.exists()) {
+                    const data = configSnap.val();
+                    if (data.admin_profile.name.toLowerCase().includes(query) || query === "admin") matches.push({ type: 'ADMIN', data: data });
+                }
+                if (chatsSnap.exists()) {
+                    const data = chatsSnap.val();
+                    Object.keys(data).forEach(roomName => {
+                        const roomSessions = data[roomName];
+                        if (roomName.toLowerCase().includes(query)) matches.push({ type: 'CHAT', id: roomName, data: roomSessions });
+                        else {
+                            let matchedSessions = {}, matchFound = false;
+                            Object.keys(roomSessions).forEach(sessionId => {
+                                if (roomSessions[sessionId].meta?.topic?.toLowerCase().includes(query)) { matchedSessions[sessionId] = roomSessions[sessionId]; matchFound = true; }
+                            });
+                            if (matchFound) matches.push({ type: 'CHAT', id: roomName, data: matchedSessions });
+                        }
+                    });
+                }
+
+                resultsArea.innerHTML = "";
+                if (matches.length > 0) matches.forEach(m => {
+                    if(m.type === 'SCHOOL') renderSchool(m.id, m.data);
+                    if(m.type === 'STUDENT') renderStudent(m.id, m.data);
+                    if(m.type === 'ADMIN') renderAdmin(m.data);
+                    if(m.type === 'CHAT') renderChat(m.id, m.data);
+                });
+                else resultsArea.innerHTML = `<div style="text-align:center; padding:100px; color:#999; font-family:'JetBrains Mono'">NO DATA FOUND</div>`;
+            } catch (error) { resultsArea.innerHTML = `<div style="padding:20px; color:red;">ERR: ${error.message}</div>`; }
+        }
+
+        // --- RENDERERS ---
+        function renderSchool(id, data) {
+            const pub = data.public_info;
+            resultsArea.innerHTML += `<div class="profile-card"><div class="pc-head"><img src="${pub.logoUrl}" class="pc-img"><div class="pc-title"><h2>${id}</h2><p>${pub.city} • SCHOOL</p></div></div><div class="pc-body"><div class="stat-grid"><div class="stat-item"><label>Principal</label><div>${pub.principalName}</div></div><div class="stat-item"><label>Bot ID</label><div style="color:blue">${pub.botName}</div></div><div class="stat-item"><label>Rank</label><div>${pub.currentRank}</div></div><div class="stat-item"><label>Wins/Matches</label><div>${pub.wins} / ${pub.matches}</div></div></div><div class="tags-row">${pub.badgesEarned ? pub.badgesEarned.map(b => `<span class="tag">${b}</span>`).join("") : ""}</div><div class="bio-box">${pub.bio}</div></div></div>`;
+        }
+        function renderStudent(id, data) {
+            const pub = data.public_info;
+            resultsArea.innerHTML += `<div class="profile-card"><div class="pc-head"><img src="${pub.avatarUrl}" class="pc-img"><div class="pc-title"><h2>${id}</h2><p>${pub.linkedSchool} • STUDENT</p></div></div><div class="pc-body"><div class="stat-grid"><div class="stat-item"><label>Class</label><div>${pub.className}</div></div><div class="stat-item"><label>Bot ID</label><div style="color:blue">${pub.botName}</div></div><div class="stat-item"><label>Rank</label><div>${pub.currentRank}</div></div><div class="stat-item"><label>Wins/Matches</label><div>${pub.wins} / ${pub.matches}</div></div></div><div class="tags-row">${pub.badgesEarned ? pub.badgesEarned.map(b => `<span class="tag">${b}</span>`).join("") : ""}</div><div class="bio-box">${pub.bio}</div></div></div>`;
+        }
+        function renderAdmin(data) {
+            const p = data.admin_profile;
+            const j = data.judge_bot;
+            resultsArea.innerHTML += `<div class="profile-card" style="border-left:4px solid #000"><div class="pc-head"><div style="width:50px;height:50px;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800">ADM</div><div class="pc-title"><h2>${p.name}</h2><p>SYSTEM ADMIN</p></div></div><div class="pc-body"><div class="stat-grid"><div class="stat-item"><label>Email</label><div>${p.email}</div></div><div class="stat-item"><label>Judge</label><div>${j.name}</div></div><div class="stat-item"><label>Model</label><div>${j.model}</div></div><div class="stat-item"><label>Location</label><div>${p.city}</div></div></div><div class="bio-box">> SYSTEM PROMPT:<br>${j.systemPrompt}</div></div></div>`;
+        }
+        function renderChat(roomId, sessions) {
+            Object.keys(sessions).forEach(sessId => {
+                const s = sessions[sessId];
+                let chatRows = (s.transcript || []).map(t => `<div class="chat-row"><div class="c-user">${t.sender}</div><div class="c-msg">${t.text}</div></div>`).join("");
+                resultsArea.innerHTML += `<div class="profile-card"><div class="pc-head"><div class="pc-title"><h2>${s.meta.topic}</h2><p>${roomId} • ${s.meta.date}</p><div class="c-winner">WINNER: ${s.meta.winner}</div></div></div><div class="pc-body">${chatRows}<div class="bio-box" style="font-weight:700">JUDGE: ${s.judge_feedback?.comment}</div></div></div>`;
+            });
+        }
+    </script>
+</body>
+</html>
