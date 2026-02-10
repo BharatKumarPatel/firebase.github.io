@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VYUHA | STRATEGIC CONSOLE</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="loadingOverlay">
+        <div class="loader-content">
+            <div class="spinner"></div>
+            <div class="loader-text">INITIALIZING VYUHA PROTOCOLS...</div>
+        </div>
+    </div>
+
+    <div id="loginOverlay">
+        <div class="login-card">
+            <div class="login-logo-area">
+                <img src="logo.png" alt="VYUHA" class="login-logo-img">
+            </div>
+            <h2 class="login-title">ACCESS TERMINAL</h2>
+            
+            <div class="input-group">
+                <input type="email" id="loginEmail" placeholder="IDENTIFIER (EMAIL)" autocomplete="off">
+            </div>
+            <div class="input-group">
+                <input type="password" id="loginPass" placeholder="SECURITY KEY">
+            </div>
+            
+            <button id="btnLogin" class="btn-primary">ESTABLISH CONNECTION</button>
+            <div id="loginMsg" class="error-msg"></div>
+        </div>
+    </div>
+
+    <div id="appContainer" class="hidden">
+        
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="logo.png" alt="Logo" class="main-logo">
+            </div>
+
+            <div class="sidebar-user">
+                <div id="sidebarAvatar" class="avatar-circle"></div>
+                <div class="user-meta">
+                    <span id="sidebarName">USER</span>
+                    <span id="sidebarRole" class="badge">UNIT</span>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item active" onclick="switchTab('profile')">
+                    <i class="ph-bold ph-identification-card"></i>
+                    <span>IDENTITY</span>
+                </button>
+                <button class="nav-item" onclick="switchTab('ai')">
+                    <i class="ph-bold ph-brain"></i>
+                    <span>NEURAL LOGIC</span>
+                </div>
+                <button class="nav-item hidden" id="navAdmin" onclick="switchTab('admin')">
+                    <i class="ph-bold ph-command"></i>
+                    <span>WAR ROOMS</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="btnLogout" class="btn-logout">
+                    <i class="ph-bold ph-power"></i>
+                    <span>DISCONNECT</span>
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <div class="content-wrapper"> <section id="tab-profile" class="tab-pane">
+                    
+                    <div class="section-head">
+                        <h1>IDENTITY CONFIGURATION</h1>
+                        <p>MANAGE UNIT CREDENTIALS AND PUBLIC PROFILE</p>
+                    </div>
+
+                    <div id="statsPanel" class="stats-grid hidden">
+                        <div class="stat-item">
+                            <label>CURRENT RANK</label>
+                            <div id="valRank" class="stat-value">--</div>
+                        </div>
+                        <div class="stat-item">
+                            <label>TOTAL WINS</label>
+                            <div id="valWins" class="stat-value">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <label>MATCHES</label>
+                            <div id="valMatches" class="stat-value">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <label>STATUS</label>
+                            <div id="valStatus" class="stat-value active">ACTIVE</div>
+                        </div>
+                    </div>
+
+                    <div class="form-layout">
+                        <div class="form-row">
+                            <div class="input-wrapper">
+                                <label>UNIT NAME <span class="tag-locked">LOCKED</span></label>
+                                <input type="text" id="p_name" disabled class="input locked">
+                            </div>
+                            <div class="input-wrapper">
+                                <label>BOT ID <span class="tag-locked">LOCKED</span></label>
+                                <input type="text" id="p_botName" disabled class="input locked">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-wrapper">
+                                <label>OPERATIONAL BASE (CITY)</label>
+                                <input type="text" id="p_city" class="input">
+                            </div>
+                            <div class="input-wrapper" id="grp_affiliation">
+                                <label>AFFILIATION</label>
+                                <input type="text" id="p_link" class="input">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-wrapper">
+                                <label>SECURE EMAIL</label>
+                                <input type="email" id="p_email" disabled class="input locked">
+                            </div>
+                            <div class="input-wrapper" id="grp_mobile">
+                                <label>EMERGENCY COMM (MOBILE)</label>
+                                <input type="text" id="p_mobile" class="input">
+                            </div>
+                        </div>
+
+                        <div class="input-wrapper" id="grp_logo">
+                            <label>VISUAL IDENTIFIER (AVATAR)</label>
+                            <div id="logoSelector" class="logo-grid"></div>
+                            <input type="hidden" id="p_logo_value">
+                        </div>
+
+                        <div class="input-wrapper full">
+                            <label>MANIFESTO / BIO</label>
+                            <textarea id="p_bio" class="input textarea"></textarea>
+                        </div>
+
+                        <div class="input-wrapper full highlight-box">
+                            <label>UPDATE ACCESS KEY (PASSWORD)</label>
+                            <input type="text" id="p_pass" class="input" placeholder="ENTER NEW STRONG PASSWORD">
+                            <div class="hint-text">MUST CONTAIN 8+ CHARACTERS, NUMBER & SYMBOL</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section id="tab-ai" class="tab-pane hidden">
+                    <div class="section-head">
+                        <h1>NEURAL LOGIC</h1>
+                        <p>CONFIGURE API PARAMETERS AND BATTLE STRATEGIES</p>
+                    </div>
+
+                    <div class="form-layout">
+                        <div class="input-wrapper full">
+                            <label>GOOGLE GEMINI API KEY <span class="tag-visible">VISIBLE</span></label>
+                            <input type="text" id="ai_key" class="input code-font" placeholder="Paste API Key here...">
+                        </div>
+                        <div class="input-wrapper">
+                            <label>MODEL VERSION</label>
+                            <input type="text" id="ai_model" class="input code-font" value="gemini-2.5-flash">
+                        </div>
+                        
+                        <div class="input-wrapper full">
+                            <label>GLOBAL SYSTEM PROMPT</label>
+                            <textarea id="ai_global" class="input textarea code-font"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="divider">
+                        <span>ROOM SPECIFIC OVERRIDES</span>
+                    </div>
+
+                    <div id="roomPromptsContainer" class="room-prompts-list">
+                        </div>
+                </section>
+
+                <section id="tab-admin" class="tab-pane hidden">
+                    <div class="section-head">
+                        <h1>WAR ROOM MANAGER</h1>
+                        <p>DEPLOY OR DESTROY BATTLEFIELDS</p>
+                    </div>
+
+                    <div class="create-room-panel">
+                        <h3>DEPLOY NEW SECTOR</h3>
+                        <div class="create-form">
+                            <input type="text" id="new_room_name" placeholder="ROOM NAME" class="input">
+                            <input type="text" id="new_room_topic" placeholder="TOPIC FOCUS" class="input">
+                            <select id="new_room_diff" class="input">
+                                <option>Easy</option>
+                                <option>Medium</option>
+                                <option>Hard</option>
+                            </select>
+                            <button id="btnCreateRoom" class="btn-action">DEPLOY</button>
+                        </div>
+                    </div>
+
+                    <div class="room-list-wrapper">
+                        <label>ACTIVE SECTORS</label>
+                        <div id="adminRoomList"></div>
+                    </div>
+                </section>
+
+                <div class="bottom-spacer"></div>
+
+            </div>
+        </main>
+
+        <div class="action-bar">
+            <div class="support-info">
+                <i class="ph-bold ph-lifebuoy"></i>
+                <span>SUPPORT: <a href="mailto:ibbchoudhary@gmail.com">IBBCHOUDHARY@GMAIL.COM</a></span>
+            </div>
+            <button id="btnSave" class="btn-save">
+                SAVE SYSTEM CHANGES
+            </button>
+        </div>
+
+    </div>
+
+    <script type="module" src="script.js"></script>
+
+</body>
+</html>
